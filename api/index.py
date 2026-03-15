@@ -1,4 +1,4 @@
-"""YouTube Transcript API - Vercel Serverless"""
+"""YouTube Transcript API - Vercel Serverless with proper WSGI handler"""
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -10,6 +10,7 @@ CORS(app)
 app.config['JSON_SORT_KEYS'] = False
 
 def extract_video_id(url: str) -> str:
+    """Extract YouTube video ID from various URL formats"""
     if len(url) == 11 and url.isalnum():
         return url
     match = re.search(r'youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})', url)
@@ -21,6 +22,7 @@ def extract_video_id(url: str) -> str:
     raise ValueError(f"Invalid YouTube URL: {url}")
 
 def handle_errors(f):
+    """Decorator to handle errors in routes"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
@@ -31,16 +33,19 @@ def handle_errors(f):
 
 @app.route('/', methods=['GET'])
 def index():
-    return jsonify({'status': 'success', 'message': 'YouTube Transcript API on Vercel!', 'version': '1.0.0'})
+    """Health check and info endpoint"""
+    return jsonify({'status': 'success', 'message': 'YouTube Transcript API', 'version': '1.0.0'})
 
 @app.route('/health', methods=['GET'])
 def health():
+    """Health status endpoint"""
     return jsonify({'status': 'healthy'})
 
 @app.route('/api/transcript', methods=['POST', 'GET'])
 @app.route('/transcript', methods=['POST', 'GET'])
 @handle_errors
 def get_transcript():
+    """Get transcript for a YouTube video"""
     if request.method == 'POST':
         data = request.get_json() or {}
         url = data.get('url', '').strip()
@@ -72,6 +77,7 @@ def get_transcript():
 @app.route('/list-transcripts', methods=['POST', 'GET'])
 @handle_errors
 def list_transcripts():
+    """List available transcripts for a video"""
     if request.method == 'POST':
         url = request.get_json().get('url', '').strip()
     else:
@@ -99,6 +105,7 @@ def list_transcripts():
 @app.route('/transcript/text', methods=['POST', 'GET'])
 @handle_errors
 def get_text():
+    """Get transcript as plain text"""
     if request.method == 'POST':
         data = request.get_json() or {}
         url = data.get('url', '').strip()
@@ -124,10 +131,15 @@ def get_text():
 
 @app.errorhandler(404)
 def not_found(e):
+    """Handle 404 errors"""
     return jsonify({'status': 'error', 'error': 'Not found'}), 404
 
 @app.errorhandler(500)
 def internal_error(e):
+    """Handle 500 errors"""
     return jsonify({'status': 'error', 'error': f'Internal Server Error: {str(e)}'}), 500
+
+# WSGI entrypoint - this is what Vercel will call
+# No need for explicit handler function, Flask app object itself is WSGI compatible
 
 
