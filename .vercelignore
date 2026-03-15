@@ -1,0 +1,10 @@
+app.py
+main.py
+run.sh
+example.py
+.venv
+.git
+*.md
+*.pyc
+__pycache__
+.DS_Store
