@@ -58,19 +58,14 @@ def get_transcript():
         return jsonify({'status': 'error', 'error': 'Missing url parameter'}), 400
     
     video_id = extract_video_id(url)
-    ytt_api = YouTubeTranscriptApi()
-    transcript = ytt_api.fetch(video_id, languages=[language])
-    try:
-        raw = transcript.to_raw_data()
-    except:
-        raw = list(transcript)
+    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[language])
     
     return jsonify({
         'status': 'success',
         'video_id': video_id,
         'language': language,
-        'transcript': raw,
-        'snippet_count': len(raw)
+        'transcript': transcript,
+        'snippet_count': len(transcript)
     }), 200
 
 @app.route('/api/list-transcripts', methods=['POST', 'GET'])
@@ -87,8 +82,7 @@ def list_transcripts():
         return jsonify({'status': 'error', 'error': 'Missing url parameter'}), 400
     
     video_id = extract_video_id(url)
-    ytt_api = YouTubeTranscriptApi()
-    transcript_list = ytt_api.list(video_id)
+    transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
     
     transcripts = []
     for t in transcript_list:
@@ -118,15 +112,9 @@ def get_text():
         return jsonify({'status': 'error', 'error': 'Missing url parameter'}), 400
     
     video_id = extract_video_id(url)
-    ytt_api = YouTubeTranscriptApi()
-    transcript = ytt_api.fetch(video_id, languages=[language])
+    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[language])
     
-    try:
-        raw = transcript.to_raw_data()
-    except:
-        raw = list(transcript)
-    
-    text = ' '.join([item['text'] for item in raw])
+    text = ' '.join([item['text'] for item in transcript])
     return jsonify({'status': 'success', 'video_id': video_id, 'language': language, 'text': text}), 200
 
 @app.errorhandler(404)
