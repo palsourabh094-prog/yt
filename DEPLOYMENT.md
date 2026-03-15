@@ -49,7 +49,7 @@ vercel
 curl https://your-vercel-url.vercel.app/health
 # Expected: {"status": "healthy"}
 
-curl -X POST https://your-vercel-url.vercel.app/transcript \
+curl -X POST https://yt-phi-nine.vercel.app/transcript \
   -H "Content-Type: application/json" \
   -d '{"url": "https://youtu.be/O-1wyUQX4yc"}'
 ```
