@@ -37,6 +37,7 @@ def index():
 def health():
     return jsonify({'status': 'healthy'})
 
+@app.route('/api/transcript', methods=['POST', 'GET'])
 @app.route('/transcript', methods=['POST', 'GET'])
 @handle_errors
 def get_transcript():
@@ -67,6 +68,7 @@ def get_transcript():
         'snippet_count': len(raw)
     }), 200
 
+@app.route('/api/list-transcripts', methods=['POST', 'GET'])
 @app.route('/list-transcripts', methods=['POST', 'GET'])
 @handle_errors
 def list_transcripts():
@@ -93,6 +95,7 @@ def list_transcripts():
     
     return jsonify({'status': 'success', 'video_id': video_id, 'transcripts': transcripts}), 200
 
+@app.route('/api/transcript/text', methods=['POST', 'GET'])
 @app.route('/transcript/text', methods=['POST', 'GET'])
 @handle_errors
 def get_text():
@@ -122,3 +125,8 @@ def get_text():
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({'status': 'error', 'error': 'Not found'}), 404
+
+# Vercel serverless entry point
+def handler(request):
+    return app(request)
+
