@@ -4,11 +4,6 @@ from flask_cors import CORS
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 from functools import wraps
-import sys
-import os
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = Flask(__name__)
 CORS(app)
@@ -131,7 +126,8 @@ def get_text():
 def not_found(e):
     return jsonify({'status': 'error', 'error': 'Not found'}), 404
 
-if __name__ == '__main__':
-    app.run(debug=False)
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({'status': 'error', 'error': f'Internal Server Error: {str(e)}'}), 500
 
 
